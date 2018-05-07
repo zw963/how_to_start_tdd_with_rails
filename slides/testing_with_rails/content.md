@@ -29,6 +29,8 @@ What is TDD ?
 Thinking code from test.
 <!-- .element class="fragment" -->
 
+<p class="fragment">GDD<span class="fragment"> -> Guess-Driven Development<span></p>
+
 ---
 
 ### Looks Good ？
@@ -171,10 +173,14 @@ https://martinfowler.com/articles/is-tdd-dead/
 开发之前, 通过测试了解实现代码的功能, 后面会有个如果不看测试, 完全看不懂在干什么的单元测试例子, 事实上, 我们的 backend 项目也有同样的问题, 因为采用 graphQL 的缘故, 因为没有测试, 根本不知道 backend 对外提供那些接口, 相比传统 RESTful, 我们更需要测试.
 <!-- .element: class="fragment" -->
 
-<p>开发过程中, 快速的构造任意 业务逻辑所需数据, 通过 <span style="color: yellow">运行测试</span> 来驱动快速的开发迭代, 为在某个上下文, <span style="color: yellow">编写/验证</span>业务逻辑提供便利</p>
+<p>开发过程中, 快速的构造任意 业务逻辑所需数据, 通过 <span style="color: yellow">运行测试</span> 来驱动小步快速的开发迭代, 为在某个上下文, <span style="color: yellow">编写/验证</span>业务逻辑提供便利</p>
 <!-- .element: class="fragment" -->
 
 <p>留下大量测试代码用做 <span style="color: yellow">回归测试</span>, 不需要担心改动会引入很严重的 bug, 提高开发效率.(无法取代常规测试, 但会让测试同学测起来更有信心)</p>
+<!-- .element: class="fragment" -->
+
+
+<p>你在用图表和文字, 帮助在大脑里建立测试用例, 而我直接写出测试用例</p>
 <!-- .element: class="fragment" -->
 
 ---
@@ -619,6 +625,15 @@ end
 <li class="fragment">从测试的角度思考, 熟悉测试框架, 都是学习成本</li>
 
 </ol>
+
+---
+
+### TDD 不适合的领域
+
+1. 不了解的东西, 不应该写测试
+2. TDD 不适合初创业务, 变化特别快的部分, 等稳定后再写测试.
+3. 针对 UI 写测试, 得不偿失, 你能想出来怎么给 CSS 样式写测试吗?
+
 ----
 
 ### 一些个人测试的经验分享
