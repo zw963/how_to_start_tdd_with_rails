@@ -6,7 +6,7 @@
 
 <p class="fragment">个推的接入 <span class="fragment">=> 其实就是介绍下个推 API</span></p>
 
-<p class="fragment">介绍一下开发的过程 <span class="fragment">=> 谈不上什么最佳实践 </span></p>
+<p class="fragment">介绍一下开发的过程 <span class="fragment">=> 只是一些个人的实践 </span></p>
 
 <p class="fragment">异步消息模式介绍 <span class="fragment">=> 我们其实没用上, 凑时间的</span></p>
 
@@ -18,13 +18,13 @@
 
 ### 平台注册
 
-会注册一个 App 唯一的 ID.
+会注册一个 App 唯一的 app id.
 <!-- .element: class="fragment" -->
 
-会注册一个 App 与 SDK 通信的 Key
+会注册一个 App 与 SDK 通信的 app key.
 <!-- .element: class="fragment" -->
 
-会生成一个可以反复重置的 master secret
+会生成一个可以反复重置的 master secret.
 <!-- .element: class="fragment" -->
 
 ---
@@ -75,6 +75,9 @@ curl -s -H Content-Type: application/json \
     }
 
 ```
+
+curl 命令:
+
  <small><span style="color: yellow">-s, --silent</span>        # => 静默模式, 不显示 "进度条" 以及 "错误信息"</small>
 <!-- .slide: style="text-align: left;" -->
 
@@ -141,7 +144,7 @@ curl -H Content-Type: application/json \
 
 <small><span style="color: yellow">cid: </span>每个设备唯一的 client id</small>
 
-<small><span style="color: yellow">requestid: </span>按照个推的要求, 生成一个 30 位的 requestid 给它.<span class="fragment" style="color: red"> 我们后面会提到它</span></small>
+<small><span style="color: yellow">requestid: </span>按照个推的要求, 生成一个 30 位的 requestid 给它. 我们后面会提到它</span></small>
 
 ---
 
@@ -155,7 +158,7 @@ curl -H Content-Type: application/json \
 <!-- .element: class="fragment" -->
 <!-- .slide: style="text-align: left;" -->
 
-<small>3. 讨论时需求搞的很复杂, 个推所有接口都 wrap 了一遍, 但用的时候, 除了<span style="color:red"> "单推" </span>, 没人 care 其他方式,
+<small>3. 讨论时需求搞的很复杂, 个推所有接口都 wrap 了一遍, 但用的时候, 除了<span style="color:red"> "单推" </span>, 没人 care 了,
 即使很多内容完全一致的推送, 可以几乎不做更改的替换成<span style="color:red"> "群推" </span>接口.</small>
 <!-- .element: class="fragment" -->
 <!-- .slide: style="text-align: left;" -->
@@ -178,7 +181,7 @@ curl -H Content-Type: application/json \
 还有个额外的好处:
 <!-- .element: class="fragment" -->
 
-<p class="fragment"> 用这些脚本调试个推的服务. <span class="fragment" style="color: red">=> 搞清楚谁的锅</span></p>
+<p class="fragment"> 用这些脚本调试个推的服务<span class="fragment">. => 搞清楚谁的锅</span></p>
 
 ---
 
@@ -215,20 +218,20 @@ Rails 过于庞大, 复杂, Overkill.
 编写测试, 并且使用 VCR, 不断重构代码.
 <!-- .element: class="fragment" -->
 
-调用服务的代码, 封装成库, 放在 lib/ 目录下面.
+调用 "外部服务" 的代码, 封装成库, 放在 lib/ 下面.
 <!-- .element: class="fragment" -->
 
-保存第三方服务返回的 response 到一个 json 字段. (你不知道将来可能用到那些信息)
+保存第三方服务返回的 response 到一个 json 字段. (你不知道将来那些信息有用)
 <!-- .element: class="fragment" -->
 
-作为 Api 给别的项目调用时, 使用 named parameter (命名参数), 含义更清晰.
+作为 API 给别的项目调用时, 方法使用 named parameter (命名参数), 含义更清晰.
 <!-- .element: class="fragment" -->
 
 ---
 
 遇到的问题:
 
-<small>1. 个推的推送任务, 是异步执行的.</small>
+<small>1. 个推的推送任务, 是异步执行的, 只是返回一个 taskid</small>
  <!-- .element: class="fragment" -->
 <!-- .slide: style="text-align: left;" -->
 
@@ -251,6 +254,14 @@ Rails 过于庞大, 复杂, Overkill.
 
 ---
 
+- 不要一开始就考虑异步, 首先功能正确, 再换异步.
+
+- 为异步代码添加测试 (异步的库一般都提供插件)
+
+- 只在需要的时候才加.
+
+---
+
 ### <span style="color: red">"业务模式"</span> 决定采用的异步模型
 
 ---
@@ -261,7 +272,7 @@ pusher 业务模式:
 <small>2. 失败的可能性比较小, 没有<span style="color: red"> 重新再发 </span>的需求.</small>
 <small>2. pusher 属于非关键性业务, 偶尔丢几条也没关系.</small>
 
-fast and non-mission critical
+典型的 fast and non-mission critical.
 
 ---
 
@@ -280,21 +291,18 @@ fast and non-mission critical
 
 有的服务执行只需要 100ms, 有的则需要 10 秒.
 
-举例: 上传视频服务(10秒) 和 推送(100ms) 共用同一个队列.
+<small>举例: 上传视频服务(10秒) 和 推送(100ms) 共用同一个队列, 上传视频如果失败, 还会反复重试, 引起队列阻塞.</small>
 
-上传视频如果失败, 还会反复重试, 引起队列阻塞.
+
 
 ---
 
-针对不同的服务, 使用单独的队列.
-
-queue per destination
-<!-- .element: class="fragment" -->
+针对不同的服务, 使用单独的队列. <small>(queue per destination)</small>
 
 视频和推送使用单独的队列.
 <!-- .element: class="fragment" -->
 
-要考虑队列的优先级, 以及吞吐量
+并且考虑不同队列的优先级、吞吐量
 <!-- .element: class="fragment" -->
 
 <span style="color: red">问题解决</span>
@@ -304,7 +312,7 @@ queue per destination
 
 ### 还有更复杂的情况
 
-例如: 多个消费者请求同一个服务
+多个消费者请求同一个服务
 <!-- .element: class="fragment" -->
 
 ---
@@ -325,16 +333,88 @@ queue per destination
 解决办法:
 
 <p class="fragment"> 1. 等待第一个推完, 后面两个要等 15 分钟 <span class="fragment" style="color: red">不好.</span></p>
+<p class="fragment"> 2. 将第一个拆分, 先推 100 条, 将剩下的 4900 条放入一个单独的延迟队列, 后面的先执行. <span class="fragment" style="color: red">复杂, 且增加了网络带宽、存储消耗.</span></p>
 
-<p class="fragment"> 2. 将第一个拆分, 先推 100 条, 将剩下的 4900 条放入一个单独的延迟队列, 后面的先执行. <span class="fragment" style="color: red">不好.</span></p>
+<p class="fragment">我们需要为 "<span style="color: green">每客户端/推送</span>" 创建一个单独队列</p>
 
-<p class="fragment"> 3. 其实需要为 "每客户端/推送" 创建一个单独队列</p>
+---
 
-而且我们还希望可以动态调整每个队列的吞吐量.
+仍然可能存在问题:
+
+我们可能需要很多这样的 queue.
+<!-- .element: class="fragment" -->
+<small class="fragment">(想象我们是 "个推", 需要和 "一起长大" 建立一个 queue)</small>
+
+可以希望动态调整某个队列的吞吐量.
+<!-- .element: class="fragment" -->
+<small class="fragment">(想象家长端有活动, 推送特别多)</small>
+
+希望队列中的任务按照某些策略, 重新排序.
+<!-- .element: class="fragment" -->
+<small class="fragment">(按照优先级排序, 或消耗的时间排序)</small>
+
+---
+
+我们需要将 Queue 使用数据库存储.<small>database as a queue</small>
+
+这个我还没细研究, 完全可以作为一个新的分享.
 <!-- .element: class="fragment" -->
 
 ----
 
-需要完善的地方:
+推送系统需要完善的地方:
 
-Roda
+使用 Roda 替换掉 Rails.
+<!-- .element: class="fragment" -->
+
+---
+
+### Motive
+
+- Rails 太复杂了，实现代码各种 `奇技淫巧`, 查看源码效率不高。
+
+- 动态路由, 这是 Roda 区别于任何其他框架(rails, sinatra, grape等)的地方.
+
+- plugins 系统, 所有的功能都是独立的插件，包括插件系统自己，我们不用不必要的插件, 
+也可以自己编写项目特定目的插件. <span class="fragment" style="color:green">Sequel 就是这样做的</span>
+
+---
+
+<small>
+ORM => 我们用的 Sequel, 最大的一个部分已经完成了.
+<!-- .element: class="fragment" -->
+
+自动化测试框架 => Ruby自带, 稍微 Hack 一下, 已经工作了
+<!-- .element: class="fragment" -->
+
+迁移代码 => 几乎不需要更改, 直接可用
+<!-- .element: class="fragment" -->
+
+功能验证 => 测试覆盖率: 97.74%
+<!-- .element: class="fragment" -->
+
+<p class="fragment">开发自动 reloader => [autoload_reloader](https://github.com/Shopify/autoload_reloader)</p>
+
+<p class="fragment">数据库迁移 => [standalone_migrations](https://github.com/thuss/standalone-migrations)</p>
+
+<p class="fragment" style="color: red">其他用到的库, 完全一样。</p>
+</small>
+
+---
+
+要解决的问题:
+
+1. 项目采用的目录结构.
+2. 可能存在的安全风险.
+3. 非常多的 [plugins](http://roda.jeremyevans.net/rdoc/classes/Roda/RodaPlugins.html), 该用哪个需要学习成本.
+
+----
+
+以前的一片 TDD 分享:
+
+https://tech.kid17.com/tech-share/slides/pusher_practice/#/
+
+---
+
+Thanks
+
