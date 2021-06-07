@@ -1,4 +1,4 @@
-## Testing With Rails
+## How to start TDD with Rails
 
 ----
 

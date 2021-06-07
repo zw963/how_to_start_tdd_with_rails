@@ -1,7 +1,7 @@
 # slides
 
-[tutorial](https://growup-together.github.io/tech-share/slides/tutorial)
+<!-- [tutorial](https://zw963.github.io/how_to_start_tdd_with_rails/slides/tutorial) -->
 
-[Testing with rails](https://growup-together.github.io/tech-share/slides/testing_with_rails)
+[how to start TDD with rails](https://zw963.github.io/how_to_start_tdd_with_rails/slides/testing_with_rails)
 
-[pusher_practice](https://growup-together.github.io/tech-share/slides/pusher_practice)
+<!-- [一起长大推送系统实践](https://zw963.github.io/how_to_start_tdd_with_rails/slides/pusher_practice) -->
