@@ -565,7 +565,7 @@ end
 
 看测试一目了然
 
-```
+```rb
 test "当用户提供了 name_i18n_config, i18n_name 输出 I18n 版本的 name" do
   category = create(:category,
     name: "其他",
@@ -574,29 +574,28 @@ test "当用户提供了 name_i18n_config, i18n_name 输出 I18n 版本的 name"
     jp    :その他
     sg
     ru  :другое
-  "
-)
+  ")
 
-I18n.with_locale 'zh-CN' do
-assert_equal '其他', category.i18n_name
-end
+  I18n.with_locale 'zh-CN' do
+	assert_equal '其他', category.i18n_name
+  end
 
-I18n.with_locale 'en' do
-assert_equal 'others, category.i18n_name
-end
+  I18n.with_locale 'en' do
+	assert_equal 'others, category.i18n_name
+  end
 
-I18n.with_locale 'jp' do
-assert_equal 'その他', category.i18n_name
-end
+  I18n.with_locale 'jp' do
+	assert_equal 'その他', category.i18n_name
+  end
 
-I18n.with_locale 'ru' do
-assert_equal 'другое', category.i18n_name
-end
+  I18n.with_locale 'ru' do
+	assert_equal 'другое', category.i18n_name
+  end
 
-# 如果没有指定, 默认值使用 en.
-I18n.with_locale 'sg' do
-assert_equal 'others', category.i18n_name
-end
+  # 如果没有指定, 默认值使用 en.
+  I18n.with_locale 'sg' do
+	assert_equal 'others', category.i18n_name
+  end
 end
 ```
 
@@ -646,7 +645,7 @@ end
 ### 一开始只需要少量测试, 最重要的是, 先让 '测试驱动开发' 跑起来. 
 <!-- .element: class="fragment" -->
 
-### 如果有人报 bug, 先使用测试用例让 bug重现(很重要), 再修复它.
+### 如果有人报 bug, 先使用测试用例让 bug 重现(很重要), 再修复它.
 <!-- .element: class="fragment" -->
 
 ### 改功能时, 慢慢加测试, 慢慢就多起来了
